@@ -29,7 +29,7 @@ ErrorHandling.traverseErrors = (errors, cond) => {
   }
 
   const keys = Object.keys(errors);
-  const length = keys.length;
+  const { length } = keys;
 
   for (let i = 0; i < length; i += 1) {
     // If condition is met, interrupt the for loop and return relevant data

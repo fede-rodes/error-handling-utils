@@ -1,8 +1,15 @@
 {
   "name": "error-handling-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "./dist/index.js",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fede-rodes/error-handling-utils.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
@@ -12,9 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^4.17.10",
-    "prop-types": "^15.0.0",
-    "react": "^16.0.0"
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

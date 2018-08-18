@@ -56,7 +56,7 @@ ErrorHandling.getFirstError = (errors) => {
   // the end of the object is reached.
   const { index, key } = ErrorHandling.traverseErrors(errors, cond);
 
-  // Handle no errors
+  // Handle no errors found
   if (index === -1) {
     return { index, key, value: '' };
   }

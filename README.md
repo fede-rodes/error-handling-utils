@@ -1,33 +1,61 @@
-npm install -g install-local
+```
+npm install error-handling-utils
+```
 
-https://booker.codes/how-to-build-and-publish-es6-npm-modules-today-with-babel/
+API:
+
+```
+// Example errors object
+const errors = {
+  email: ['Email is required!', 'Please, provide a valid email address!'],
+  password: ['Please, at least 6 characters long!'],
+}
+
+// Returns true if any of the keys in the errors object contains at least on error (errors[key].length > 0). Returns false otherwise
+ErrorHandling.hasError(errors);
+// true
+
+// Returns a string formed by concatenating the errors of the given field/key. Returns an empty string in case of no errors
+ErrorHandling.getFieldErrors(errors, 'email');
+// 'Email is required!, Please, provide a valid email address!'
+
+// Returns a copy of the original errors object, with no errors assocaited to the provided field/key 
+const newErrors = ErrorHandling.clearErrors(errors, 'password');
+// newErrors = {
+//   email: ['Email is required!', 'Please, provide a valid email address!'],
+//   password: [],
+// }
+```
 
 Example usage:
 
 ```
 import React from 'react';
 import PropTypes from 'prop-types';
-import TextField from 'material-ui/TextField';
-import Button from 'material-ui/Button';
-import ErrorHandling from '../../../../api/error-handling';
+import { graphql } from 'react-apollo';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import ErrorHandling from 'error-handling-utils';
+import isEmail from 'validator/lib/isEmail';
+import sendPassCodeMutation from '../../graphql/user/mutation/send-pass-code';
 
 //------------------------------------------------------------------------------
 // COMPONENT:
 //------------------------------------------------------------------------------
-class LoginTokenAuthView extends React.Component {
+class EmailAuthView extends React.Component {
   state = {
     email: '',
     errors: { email: [] },
   }
 
   handleChange = ({ target }) => {
-    const field = target.id;
-    const value = target.value;
+    const { id: field, value } = target;
+    const { errors } = this.state;
 
     // Update value and clear errors for the given field
     this.setState({
       [field]: value,
-      errors: ErrorHandling.clearErrors(this.state.errors, field),
+      errors: ErrorHandling.clearErrors(errors, field),
     });
   }
 
@@ -37,14 +65,14 @@ class LoginTokenAuthView extends React.Component {
       email: [],
     };
 
-    const MAX_CHARS = 30;
+    const MAX_CHARS = 155;
 
     // Sanitize input
     const _email = email && email.trim(); // eslint-disable-line no-underscore-dangle
 
     if (!_email) {
       errors.email.push('Email is required!');
-    } else if (/* TODO: write logic to validate email */) {
+    } else if (!isEmail(_email)) {
       errors.email.push('Please, provide a valid email address!');
     } else if (_email.length > MAX_CHARS) {
       errors.email.push(`Must be no more than ${MAX_CHARS} characters!`);
@@ -69,6 +97,7 @@ class LoginTokenAuthView extends React.Component {
       onClientErrorHook,
       onServerErrorHook,
       onSuccessHook,
+      sendPassCode,
     } = this.props;
 
     // Run before logic if provided and return on error
@@ -94,21 +123,21 @@ class LoginTokenAuthView extends React.Component {
       return;
     }
 
-    Meteor.sendVerificationCode(email, (err) => {
-      if (err) {
-        onServerErrorHook(err);
-      } else {
-        this.clearFields();
-        onSuccessHook({ email });
-      }
-    });
+    try {
+      await sendPassCode({ variables: { email } });
+      this.clearFields();
+      onSuccessHook({ email });
+    } catch (exc) {
+      console.log(exc);
+      onServerErrorHook(exc);
+    }
   }
 
   render() {
     const { btnLabel, disabled } = this.props;
     const { email, errors } = this.state;
 
-    const emailErrors = ErrorHandling.getFieldErrors(errors, 'email');
+    const emailErrors = ErrorHandling.getFieldErrors(errors, 'email'); // string
 
     return (
       <form
@@ -125,7 +154,7 @@ class LoginTokenAuthView extends React.Component {
           margin="normal"
           fullWidth
           error={emailErrors.length > 0}
-          helperText={emailErrors.length > 0 ? emailErrors : ''}
+          helperText={emailErrors || ''}
         />
         <div className="mb2" />
         <Button
@@ -142,16 +171,17 @@ class LoginTokenAuthView extends React.Component {
   }
 }
 
-LoginTokenAuthView.propTypes = {
+EmailAuthView.propTypes = {
   btnLabel: PropTypes.string,
   disabled: PropTypes.bool,
   onBeforeHook: PropTypes.func,
   onClientErrorHook: PropTypes.func,
   onServerErrorHook: PropTypes.func,
   onSuccessHook: PropTypes.func,
+  sendPassCode: PropTypes.func.isRequired,
 };
 
-LoginTokenAuthView.defaultProps = {
+EmailAuthView.defaultProps = {
   btnLabel: 'Submit',
   disabled: false,
   onBeforeHook: () => {},
@@ -160,6 +190,10 @@ LoginTokenAuthView.defaultProps = {
   onSuccessHook: () => {},
 };
 
-export default LoginTokenAuthView;
+// Apollo integration
+const withMutation = graphql(sendPassCodeMutation, { name: 'sendPassCode' });
+
+export default withMutation(EmailAuthView);
+
 
 ```

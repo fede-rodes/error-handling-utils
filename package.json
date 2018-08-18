@@ -1,7 +1,7 @@
 {
   "name": "error-handling-utils",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.3",
+  "description": "Simple utility library for error handling",
   "main": "./dist/index.js",
   "engines": {
     "node": ">=4.0.0"
@@ -15,8 +15,8 @@
     "build": "babel src --presets babel-preset-es2015 --out-dir dist",
     "prepublish": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["React", "Error handling", "Errors"],
+  "author": "Federico Rodes",
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.10"

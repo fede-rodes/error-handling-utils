@@ -1,6 +1,6 @@
 {
   "name": "error-handling-utils",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Simple utility library for error handling",
   "main": "./dist/index.js",
   "engines": {

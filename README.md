@@ -15,11 +15,15 @@ const errors = {
 ErrorHandling.hasError(errors);
 // true
 
-// Returns a string formed by concatenating the errors of the given field/key. Returns an empty string in case of no errors
-ErrorHandling.getFieldErrors(errors, 'email');
-// 'Email is required!, Please, provide a valid email address!'
+// Returns the first error in the errors object
+ErrorHandling.getFirstError(errors);
+// { key: 'email', value: 'Email is required!' };
 
-// Returns a copy of the original errors object, with no errors assocaited to the provided field/key 
+// Returns a string formed by concatenating the errors of the given field/key. Returns an empty string in case of no errors. A third argument (function) can be passed to mutate the strings before concatenation (i18n for instance)
+ErrorHandling.getFieldErrors(errors, 'email');
+// 'Email is required! Please, provide a valid email address!'
+
+// Returns a copy of the original errors object, with no errors assocaited to the provided field/key
 const newErrors = ErrorHandling.clearErrors(errors, 'password');
 // newErrors = {
 //   email: ['Email is required!', 'Please, provide a valid email address!'],

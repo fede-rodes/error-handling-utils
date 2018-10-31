@@ -78,9 +78,10 @@ ErrorHandling.hasErrors = (errors) => {
 };
 //------------------------------------------------------------------------------
 /**
-* @summary Returns all errors for the given field.
+* @summary Returns all errors for the given field. A mutation (i18n for instance)
+* can be applied to the array of errors before concatenation.
 */
-ErrorHandling.getFieldErrors = (errors, field) => {
+ErrorHandling.getFieldErrors = (errors, field, mutation) => {
   if (!isObject(errors)) {
     throw new Error('Check your errors argument, it must be a valid object');
   }
@@ -101,7 +102,11 @@ ErrorHandling.getFieldErrors = (errors, field) => {
     throw new Error('Check your errors object, the value is not a valid array');
   }
 
-  return array.toString();
+  if (mutation && isFunction(mutation)) {
+    return array.map(item => mutation(item)).join(' ');
+  }
+
+  return array.join(' ');
 };
 //------------------------------------------------------------------------------
 /**

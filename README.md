@@ -1,3 +1,6 @@
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/fede-rodes/error-handling-utils.svg)](https://greenkeeper.io/)
+
 ```
 npm install error-handling-utils
 ```
